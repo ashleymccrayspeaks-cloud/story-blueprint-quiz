@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Your Stories Say About You</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0D0D0D;
+    --cream: #FAF7F2;
+    --warm: #F5F0E8;
+    --gold: #C9943A;
+    --gold-light: #E8B96A;
+    --gold-pale: #FDF3E0;
+    --rose: #C2526E;
+    --rose-pale: #FCEEF2;
+    --muted: #7A7570;
+    --border: rgba(13,13,13,0.12);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--black);
+    min-height: 100vh;
+  }
+
+  .hero {
+    background: var(--black);
+    padding: 56px 40px 48px;
+    text-align: center;
+    border-bottom: 3px solid var(--gold);
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 16px;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 52px);
+    font-weight: 700; color: var(--cream);
+    line-height: 1.1; margin-bottom: 16px;
+  }
+  .hero-title em { color: var(--gold); font-style: italic; }
+  .hero-sub {
+    font-size: 16px; color: rgba(255,255,255,0.55);
+    max-width: 520px; margin: 0 auto; line-height: 1.7;
+    font-style: italic; font-family: 'Playfair Display', serif;
+  }
+
+  .container { max-width: 680px; margin: 0 auto; padding: 48px 24px; }
+
+  .intro-card {
+    background: var(--gold-pale);
+    border: 1px solid rgba(201,148,58,0.3);
+    border-radius: 12px; padding: 24px 28px; margin-bottom: 36px;
+    text-align: center;
+  }
+  .intro-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-style: italic; color: var(--black);
+    line-height: 1.6; margin-bottom: 10px;
+  }
+  .intro-attr {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--gold); letter-spacing: 0.08em;
+  }
+
+  .form-section { margin-bottom: 32px; }
+  .form-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px; display: block;
+  }
+  .movie-row {
+    display: flex; gap: 10px; align-items: center; margin-bottom: 12px;
+  }
+  .movie-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--gold);
+    width: 28px; flex-shrink: 0; text-align: center;
+  }
+  .movie-input {
+    flex: 1; padding: 12px 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 15px;
+    background: white; border: 1px solid var(--border);
+    border-radius: 8px; color: var(--black); outline: none;
+    transition: border-color 0.2s;
+  }
+  .movie-input:focus { border-color: var(--gold); }
+  .movie-input::placeholder { color: #C0BAB0; font-style: italic; }
+
+  .name-row { display: flex; gap: 12px; margin-bottom: 32px; }
+  .name-field { flex: 1; }
+
+  .analyze-btn {
+    width: 100%; padding: 16px;
+    background: var(--black); color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 600; font-style: italic;
+    border: none; border-radius: 10px; cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.02em;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .analyze-btn:hover { background: var(--gold); color: var(--black); }
+  .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .spin { width: 18px; height: 18px; border: 2px solid rgba(201,148,58,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* RESULTS */
+  .results { display: none; margin-top: 40px; }
+  .results.visible { display: block; animation: fadeUp 0.5s ease; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  .result-header {
+    text-align: center; margin-bottom: 32px;
+    padding: 32px 24px;
+    background: var(--black); border-radius: 12px;
+    border-bottom: 3px solid var(--gold);
+  }
+  .result-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--gold); letter-spacing: 0.15em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .result-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 4vw, 30px); font-weight: 700;
+    color: var(--cream); line-height: 1.2; margin-bottom: 8px;
+  }
+  .result-sub {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-style: italic;
+    color: rgba(255,255,255,0.5); line-height: 1.6;
+  }
+
+  .result-body {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; line-height: 1.8; color: var(--black);
+    white-space: pre-wrap; margin-bottom: 28px;
+  }
+
+  .tags-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; padding: 5px 12px; border-radius: 20px;
+    border: 1px solid var(--gold); color: var(--gold);
+    background: var(--gold-pale); letter-spacing: 0.05em;
+  }
+
+  .share-block {
+    background: var(--rose-pale); border: 1px solid rgba(194,82,110,0.2);
+    border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 28px;
+  }
+  .share-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--rose); text-transform: uppercase;
+    letter-spacing: 0.1em; margin-bottom: 10px;
+  }
+  .share-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-style: italic; color: var(--black);
+    line-height: 1.6; margin-bottom: 16px;
+  }
+  .share-btn {
+    display: inline-block; padding: 10px 24px;
+    background: var(--rose); color: white;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    border-radius: 6px; cursor: pointer; border: none; margin: 4px;
+    transition: opacity 0.2s;
+  }
+  .share-btn:hover { opacity: 0.85; }
+  .share-btn.gold { background: var(--gold); }
+
+  .try-again {
+    width: 100%; padding: 12px;
+    background: transparent; color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .try-again:hover { border-color: var(--gold); color: var(--gold); }
+
+  .ashley-footer {
+    text-align: center; margin-top: 48px; padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  .af-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px; color: var(--muted); font-style: italic;
+    line-height: 1.7; margin-bottom: 12px;
+  }
+  .af-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--gold); letter-spacing: 0.08em;
+    text-decoration: none; border-bottom: 1px solid var(--gold);
+    padding-bottom: 2px;
+  }
+  .divider {
+    height: 1px; background: var(--border); margin: 28px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">A blueprint finder by Ashley McCray Ford</div>
+  <div class="hero-title">What are your stories<br><em>saying about you?</em></div>
+  <div class="hero-sub">The movies and shows we return to aren't random. They're telling us something about who we already are.</div>
+</div>
+
+<div class="container">
+
+  <div class="intro-card">
+    <div class="intro-quote">"At mile 13 of my first triathlon — soaking wet, no music allowed — I started singing showtunes. Full AIDA. Then RENT. Then Moulin Rouge. That's when I realized: the stories we carry deepest are our blueprint."</div>
+    <div class="intro-attr">— Ashley McCray Ford · The Songs I Sang at Mile 13</div>
+  </div>
+
+  <div id="formSection">
+    <div class="form-section">
+      <label class="form-label">Your name (optional)</label>
+      <input class="movie-input" id="userName" placeholder="First name..." style="margin-bottom:20px;">
+
+      <label class="form-label">Enter your 3 most rewatched movies, shows, or musicals</label>
+
+      <div class="movie-row">
+        <div class="movie-num">1</div>
+        <input class="movie-input" id="m1" placeholder="e.g. AIDA, The Wiz, Love & Basketball...">
+      </div>
+      <div class="movie-row">
+        <div class="movie-num">2</div>
+        <input class="movie-input" id="m2" placeholder="e.g. RENT, Insecure, Brown Sugar...">
+      </div>
+      <div class="movie-row">
+        <div class="movie-num">3</div>
+        <input class="movie-input" id="m3" placeholder="e.g. Moulin Rouge, Coming to America...">
+      </div>
+    </div>
+
+    <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
+      <span id="btnText">Read my blueprint</span>
+    </button>
+  </div>
+
+  <div class="results" id="results">
+    <div class="result-header" id="resultHeader">
+      <div class="result-name" id="resultName"></div>
+      <div class="result-headline" id="resultHeadline"></div>
+      <div class="result-sub" id="resultSub"></div>
+    </div>
+
+    <div class="tags-row" id="tagsRow"></div>
+
+    <div class="result-body" id="resultBody"></div>
+
+    <div class="share-block">
+      <div class="share-label">Share your blueprint</div>
+      <div class="share-text" id="shareSnippet"></div>
+      <button class="share-btn gold" onclick="copyResult()">Copy my blueprint</button>
+      <button class="share-btn" onclick="shareSubstack()">Read Ashley's story →</button>
+    </div>
+
+    <button class="try-again" onclick="reset()">← Try different stories</button>
+  </div>
+
+  <div class="ashley-footer">
+    <div class="af-text">This quiz was born at mile 13 of a triathlon, somewhere between AIDA and Moulin Rouge.<br>Read the full story in Ashley's newsletter.</div>
+    <a class="af-link" href="https://ashleymccrayford.substack.com" target="_blank">Read: The Songs I Sang at Mile 13 →</a>
+  </div>
+
+</div>
+
+<script>
+let lastResult = '';
+
+async function analyze() {
+  const m1 = document.getElementById('m1').value.trim();
+  const m2 = document.getElementById('m2').value.trim();
+  const m3 = document.getElementById('m3').value.trim();
+  const name = document.getElementById('userName').value.trim();
+
+  if (!m1 || !m2 || !m3) {
+    alert('Please enter all three stories — the blueprint needs all three to work.');
+    return;
+  }
+
+  const btn = document.getElementById('analyzeBtn');
+  const btnText = document.getElementById('btnText');
+  btn.disabled = true;
+  btnText.innerHTML = '<span class="spin"></span> Reading your blueprint...';
+
+  const prompt = `You are a warm, insightful personality analyst for Ashley McCray Ford's newsletter "The Songs I Sang at Mile 13." Ashley's thesis: the stories we return to most — movies, shows, musicals — reveal our deepest values, how we love, what we fight for, and who we are.
+
+${name ? `The person's name is ${name}.` : 'The person did not share their name.'}
+Their three most rewatched stories: "${m1}", "${m2}", "${m3}"
+
+Write a personality blueprint analysis in Ashley's voice — warm, poetic, specific, a little cracking-open. Ashley's voice is: Playfair Display energy. Sermons and love letters. "That's not a personality quiz result. That's a blueprint."
+
+Respond ONLY with valid JSON, no markdown:
+{
+  "headline": "<5-10 word poetic title for their blueprint — e.g. 'The One Who Fights for Love and Stays'>",
+  "subheadline": "<one sentence — the core of who they are>",
+  "tags": ["<3-5 single word or short phrase core values/traits>"],
+  "analysis": "<3-4 paragraphs. Para 1: what the combination of these three stories reveals about their deepest values. Para 2: how they love and what they fight for. Para 3: their relationship to beauty, community, legacy. Para 4: one specific, personal insight that feels almost uncomfortably accurate. Each paragraph 3-5 sentences. No bullet points. Flowing prose. Ashley's voice.>",
+  "shareSnippet": "<2 sentences they'd want to share on Instagram or text to a friend. Poetic, specific to their three stories. Starts with the story titles.>"
+}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    let text = data.content?.[0]?.text || '{}';
+    text = text.replace(/```json|```/g, '').trim();
+    const r = JSON.parse(text);
+
+    document.getElementById('resultName').textContent = name ? `${name}'s blueprint` : 'Your blueprint';
+    document.getElementById('resultHeadline').textContent = r.headline || '';
+    document.getElementById('resultSub').textContent = r.subheadline || '';
+
+    const tagsRow = document.getElementById('tagsRow');
+    tagsRow.innerHTML = (r.tags || []).map(t => `<div class="tag">${t}</div>`).join('');
+
+    document.getElementById('resultBody').textContent = r.analysis || '';
+    document.getElementById('shareSnippet').textContent = r.shareSnippet || '';
+
+    lastResult = `My story blueprint from "${m1}", "${m2}" & "${m3}":\n\n${r.headline}\n\n${r.shareSnippet}\n\nFind yours → ashleymccrayford.substack.com`;
+
+    document.getElementById('formSection').style.display = 'none';
+    const results = document.getElementById('results');
+    results.classList.add('visible');
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch(e) {
+    alert('Something went wrong — please try again.');
+    console.error(e);
+  }
+
+  btn.disabled = false;
+  btnText.textContent = 'Read my blueprint';
+}
+
+function copyResult() {
+  navigator.clipboard.writeText(lastResult).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = 'Copy my blueprint', 2000);
+  });
+}
+
+function shareSubstack() {
+  window.open('https://ashleymccrayford.substack.com', '_blank');
+}
+
+function reset() {
+  document.getElementById('formSection').style.display = 'block';
+  document.getElementById('results').classList.remove('visible');
+  document.getElementById('m1').value = '';
+  document.getElementById('m2').value = '';
+  document.getElementById('m3').value = '';
+  document.getElementById('userName').value = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !document.getElementById('analyzeBtn').disabled) analyze();
+});
+</script>
+</body>
+</html>
